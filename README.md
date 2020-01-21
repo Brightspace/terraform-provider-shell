@@ -1,4 +1,4 @@
-Terraform Provider
+Shell Terraform Provider
 ==================
 
 - Website: https://www.terraform.io
