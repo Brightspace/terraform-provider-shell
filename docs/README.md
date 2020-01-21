@@ -8,7 +8,7 @@ This provider is intended to be used for situations where implementing a terrafo
 
 ## Example Usage
 
-```
+```terraform
 # Configure the Shell provider
 provider "shell" {
   working_directory = "/tmp"
@@ -17,15 +17,28 @@ provider "shell" {
     USERNAME = "MyUser"
     PASSWORD = "Password1"
   }
-
-  prune = [
-    "Remove this prefix from outputs"
-  ]
 }
 
 # Map to a script
-resource "shell" "run_script_x" {
+resource "shell" "run_script" {
   # ...
+}
+```
+
+And a simple powershell can be written like so, where the target output is specified by the environment variable `TF_DATA_FILE`.
+
+```powershell
+param(
+    [String]$Action
+)
+
+Write-Output "$($env:TF_ID): ID Passed in."
+$Result = Get-FromMyService | ConvertTo-JSON
+switch($Action) {
+   "create" { Set-Content -Path $env:TF_DATA_FILE -Value $Result; break}
+   "read" { Set-Content -Path $env:TF_DATA_FILE -Value $Result; break}
+   "delete" { Set-Content -Path $env:TF_DATA_FILE -Value ""; break}
+   "update" { Set-Content -Path $env:TF_DATA_FILE -Value $Result; break}
 }
 ```
 
@@ -35,4 +48,3 @@ The following arguments are supported in the `provider` block:
 
 - `working_directory` - (Optional) The direction where the scripts will run from. It will be defaulted to a temporary location.
 - `variables` - (Optional) Environment variables that will be passed down to all scripts using this provider.
-- `prune` - (Optional) A workaround to prune text that cannot be suppressed from outputs.
